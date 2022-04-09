@@ -46,13 +46,13 @@ const MapComponent = () => {
         console.log(event.latLng.lat(), event.latLng.lng()) 
     }
 
-    const markerClicked = (event, index) => {  
+    const markerClicked = (marker, index) => {  
         setActiveInfoWindow(index)
-        console.log(event.latLng.lat(), event.latLng.lng())
+        console.log(marker, index)
     }
 
-    const markerDragEnd = (event, index) => { 
-        console.log(event.latLng.lat(), event.latLng.lng())
+    const markerDragEnd = (marker, index) => { 
+        console.log(marker, index)
     }
 
     return (
@@ -69,8 +69,8 @@ const MapComponent = () => {
                         position={marker.position}
                         label={marker.label}
                         draggable={marker.draggable}
-                        onDragEnd={event => markerDragEnd(event, index)}
-                        onClick={event => markerClicked(event, index)} 
+                        onDragEnd={event => markerDragEnd(marker, index)}
+                        onClick={event => markerClicked(marker, index)} 
                     >
                         {
                             (activeInfoWindow === index)
