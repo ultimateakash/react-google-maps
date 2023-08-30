@@ -1,7 +1,12 @@
 import React, { useState } from "react";
-import { GoogleMap, InfoWindow, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, InfoWindow, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 const MapComponent = () => {
+
+    const { isLoaded, loadError } = useJsApiLoader({
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_API_KEY
+    });
+
     const initialMarkers = [
         {
             position: {
@@ -29,7 +34,7 @@ const MapComponent = () => {
         },
     ];
     
-    const [activeInfoWindow, setActiveInfoWindow] = useState("");
+    const [activeInfoWindow, setActiveInfoWindow] = useState(null);
     const [markers, setMarkers] = useState(initialMarkers);
 
     const containerStyle = {
@@ -52,38 +57,40 @@ const MapComponent = () => {
     }
 
     const markerDragEnd = (event, index) => { 
-        console.log(event.latLng.lat())
-        console.log(event.latLng.lng())
+        console.log(event.latLng.lat(), event.latLng.lng())
     }
 
     return (
-        <LoadScript googleMapsApiKey={process.env.REACT_APP_GOOGLE_API_KEY}>
-            <GoogleMap 
-                mapContainerStyle={containerStyle} 
-                center={center} 
-                zoom={15}
-                onClick={mapClicked}
-            >
-                {markers.map((marker, index) => (
-                    <Marker 
-                        key={index} 
-                        position={marker.position}
-                        label={marker.label}
-                        draggable={marker.draggable}
-                        onDragEnd={event => markerDragEnd(event, index)}
-                        onClick={event => markerClicked(marker, index)} 
-                    >
-                        {
-                            (activeInfoWindow === index)
-                            &&
-                            <InfoWindow position={marker.position}>
-                                <b>{marker.position.lat}, {marker.position.lng}</b>
-                            </InfoWindow>
-                        }  
-                    </Marker>
-                ))}
-            </GoogleMap>
-        </LoadScript>
+        isLoaded
+        &&
+        <GoogleMap 
+            mapContainerStyle={containerStyle} 
+            center={center} 
+            zoom={15}
+            onClick={mapClicked}
+        >
+            {markers.map((marker, index) => (
+                <Marker 
+                    key={index} 
+                    position={marker.position}
+                    label={marker.label}
+                    draggable={marker.draggable}
+                    onDragEnd={event => markerDragEnd(event, index)}
+                    onClick={event => markerClicked(marker, index)} 
+                >
+                    {
+                        (activeInfoWindow === index)
+                        &&
+                        <InfoWindow 
+                            position={marker.position} 
+                            onCloseClick={() => setActiveInfoWindow(null)}
+                        >
+                            <b>{marker.position.lat}, {marker.position.lng}</b>
+                        </InfoWindow>
+                    }  
+                </Marker>
+            ))}
+        </GoogleMap>
     );
 };
 
